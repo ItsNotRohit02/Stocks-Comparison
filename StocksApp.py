@@ -60,7 +60,12 @@ with st.container():
         pass
     todayprice1 = round(todaytickerDF1['Close'][0],2)
     todaytickerDF10 = tickerdata1.history(period='1d',start=f"{y}-{m}-{d-2}", end=f"{y}-{m}-{d-1}")
-    todayprice10 = round(todaytickerDF10['Close'][0],2)
+    try:
+        todayprice10 = round(todaytickerDF10['Close'][0], 2)
+    except IndexError:
+        todayprice10 = todayprice1
+    else:
+        todayprice10 = round(todaytickerDF10['Close'][0], 2)
     tickerDF1 = tickerdata1.history(period='1d', start=f"{y - back}-{m}-{d}", end=f"{y}-{m}-{d}")
 
 
@@ -77,7 +82,12 @@ with st.container():
         pass
     todayprice2 = round(todaytickerDF2['Close'][0],2)
     todaytickerDF20 = tickerdata2.history(period='1d',start=f"{y}-{m}-{d-2}", end=f"{y}-{m}-{d-1}")
-    todayprice20 = round(todaytickerDF20['Close'][0],2)
+    try:
+        todayprice20 = round(todaytickerDF20['Close'][0], 2)
+    except IndexError:
+        todayprice20 = todayprice2
+    else:
+        todayprice20 = round(todaytickerDF20['Close'][0], 2)
     tickerDF2 = tickerdata2.history(period='1d', start=f"{y - back}-{m}-{d}", end=f"{y}-{m}-{d}")
 
 
@@ -94,7 +104,12 @@ with st.container():
         pass
     todayprice3 = round(todaytickerDF3['Close'][0],2)
     todaytickerDF30 = tickerdata3.history(period='1d',start=f"{y}-{m}-{d-2}", end=f"{y}-{m}-{d-1}")
-    todayprice30 = round(todaytickerDF30['Close'][0],2)
+    try:
+        todayprice30 = round(todaytickerDF30['Close'][0], 2)
+    except IndexError:
+        todayprice30 = todayprice3
+    else:
+        todayprice30 = round(todaytickerDF30['Close'][0], 2)
     tickerDF3 = tickerdata3.history(period='1d', start=f"{y - back}-{m}-{d}", end=f"{y}-{m}-{d}")
 
 
