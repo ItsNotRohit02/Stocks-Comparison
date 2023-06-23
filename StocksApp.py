@@ -1,9 +1,19 @@
 import yfinance as yf
 import streamlit as st
+from streamlit_lottie import st_lottie
 import datetime
 import pandas as pd
+import requests
 
-st.set_page_config(page_title="Stocks", page_icon="📈")
+
+def load_lottieurl(url: str):
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return r.json()
+
+
+st.set_page_config(page_title="Stock Comparison", page_icon="📈")
 st.title('Welcome to Stock Comparer!')
 
 with st.container():
@@ -17,25 +27,28 @@ with st.container():
     st.write('---')
     st.header('Select from Options below')
     selection = st.radio(label='Input Method', options=['Select', 'Type'])
-    if selection == 'Type':
-        tickername1 = st.text_input('Enter Name of Stock 1', value='AAPL')
-        tickername1 = tickername1.strip().upper()
-        test1 = tickername1
-        tickername2 = st.text_input('Enter Name of Stock 2', value='AMZN')
-        tickername2 = tickername2.strip().upper()
-        test2 = tickername2
-        tickername3 = st.text_input('Enter Name of Stock 3', value='GOOGL')
-        tickername3 = tickername3.strip().upper()
-        test3 = tickername3
-
-    else:
-        tickername1 = st.selectbox('Select Stock 1',
-                                   ['AAPL', 'AMZN', 'TSLA', 'META', 'MSFT', 'NVDA', 'AMD', 'INTC', 'GOOGL'])
-        tickername2 = st.selectbox('Select Stock 2',
-                                   ['AMZN', 'TSLA', 'AAPL', 'GOOGL', 'META', 'MSFT', 'NVDA', 'AMD', 'INTC'])
-        tickername3 = st.selectbox('Select Stock 3',
-                                   ['GOOGL', 'AAPL', 'AMZN', 'TSLA', 'META', 'MSFT', 'NVDA', 'AMD', 'INTC'])
-
+    col1, col2 = st.columns([1, 0.6])
+    with col1:
+        if selection == 'Type':
+            tickername1 = st.text_input('Enter Name of Stock 1', value='AAPL')
+            tickername1 = tickername1.strip().upper()
+            test1 = tickername1
+            tickername2 = st.text_input('Enter Name of Stock 2', value='AMZN')
+            tickername2 = tickername2.strip().upper()
+            test2 = tickername2
+            tickername3 = st.text_input('Enter Name of Stock 3', value='GOOGL')
+            tickername3 = tickername3.strip().upper()
+            test3 = tickername3
+        else:
+            tickername1 = st.selectbox('Select Stock 1',
+                                       ['AAPL', 'AMZN', 'TSLA', 'META', 'MSFT', 'NVDA', 'AMD', 'INTC', 'GOOGL'])
+            tickername2 = st.selectbox('Select Stock 2',
+                                       ['AMZN', 'TSLA', 'AAPL', 'GOOGL', 'META', 'MSFT', 'NVDA', 'AMD', 'INTC'])
+            tickername3 = st.selectbox('Select Stock 3',
+                                       ['GOOGL', 'AAPL', 'AMZN', 'TSLA', 'META', 'MSFT', 'NVDA', 'AMD', 'INTC'])
+    with col2:
+        load_icon = load_lottieurl("https://assets4.lottiefiles.com/packages/lf20_kuhijlvx.json")
+        st_lottie(load_icon, speed=0.8, reverse=False, loop=True, quality="low")
     back = st.select_slider('Select History Length for Graph (in years)',
                             options=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], value=6)
 
@@ -44,7 +57,6 @@ with st.container():
     d = today.day
     m = today.month
     y = today.year
-
     tickerdata1 = yf.Ticker(tickername1)
     todaytickerDF1 = tickerdata1.history(period='1min')
     try:
@@ -65,7 +77,6 @@ with st.container():
     else:
         todayprice10 = round(todaytickerDF10['Close'][0], 2)
     tickerDF1 = tickerdata1.history(period='1d', start=f"{y - back}-{m}-{d}", end=f"{y}-{m}-{d}")
-
     tickerdata2 = yf.Ticker(tickername2)
     todaytickerDF2 = tickerdata2.history(period='1min')
     try:
@@ -86,7 +97,6 @@ with st.container():
     else:
         todayprice20 = round(todaytickerDF20['Close'][0], 2)
     tickerDF2 = tickerdata2.history(period='1d', start=f"{y - back}-{m}-{d}", end=f"{y}-{m}-{d}")
-
     tickerdata3 = yf.Ticker(tickername3)
     todaytickerDF3 = tickerdata3.history(period='1min')
     try:
@@ -107,13 +117,13 @@ with st.container():
     else:
         todayprice30 = round(todaytickerDF30['Close'][0], 2)
     tickerDF3 = tickerdata3.history(period='1d', start=f"{y - back}-{m}-{d}", end=f"{y}-{m}-{d}")
-
     data = [tickerDF1.Close, tickerDF2.Close, tickerDF3.Close]
     data = pd.DataFrame(data)
     data = data.transpose()
     data.columns = [f'{tickername1}', f'{tickername2} ', f'{tickername3}  ']
 
 col1, col2, col3 = st.columns(3)
+
 with col1:
     st.metric(label=f'{tickername1}', value=f"{todayprice1} USD", delta=f'{round(todayprice1 - todayprice10, 2)} USD')
 with col2:
@@ -123,7 +133,7 @@ with col3:
 
 with st.container():
     st.line_chart(data=data)
-
+    
 with st.container():
     st.caption("Made by Rohit")
     st.markdown("[![Foo](https://cdn-icons-png.flaticon.com/24/25/25231.png)](https://github.com/ItsNotRohit02)")
